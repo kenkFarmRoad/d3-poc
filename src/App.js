@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import './App.css';
 import * as d3 from 'd3';
 import map from './map.png'
@@ -15,13 +15,13 @@ const Rectangle = ({ imageRef }) => {
   const [offset, setOffset] = useState({ x: 0, y: 0 })
 
   const dragEnd = useCallback(() => {
-    const parentBBox = d3.select(parentRef.current).node().getBBox();
+    const parentBBox = d3.select(imageRef.current).node().getBBox();
     const rectBBox = d3.select(ref.current).node().getBBox()
     setOffset({ x: rectBBox.x / parentBBox.width, y: rectBBox.y / parentBBox.height })
-  }, [parentRef]);
+  }, [imageRef]);
 
   useEffect(() => {
-    const parentDimension = d3.select(parentRef.current).node().getBBox();
+    const parentDimension = d3.select(imageRef.current).node().getBBox();
 
     d3.select(ref.current)
       .attr("rx", 25)
@@ -38,12 +38,12 @@ const Rectangle = ({ imageRef }) => {
       )
 
     d3.select(window).on('resize', () => {
-      const parentDimension = d3.select(parentRef.current).node().getBBox();
+      const parentDimension = d3.select(imageRef.current).node().getBBox();
       d3.select(ref.current)
         .attr("x", parentDimension.width * offset.x)
         .attr("y", parentDimension.height * offset.y)
     })
-  }, [parentRef, offset, dragEnd])
+  }, [imageRef, offset, dragEnd])
 
   return (
     <rect ref={ref} />
@@ -58,8 +58,7 @@ const Background = ({ imageRef }) => {
       .attr('height', "100%")
       .attr("x", 0)
       .attr("y", 0);
-  }, []
-  );
+  }, []);
   return (
     <image ref={imageRef} />
   )
@@ -77,17 +76,19 @@ const App = () => {
   }, [])
 
   return (
-    <svg
-      ref={ref}
-      style={{
-        width: "80vw",
-        height: "80vh",
-        border: "solid 1px"
-      }}
-    >
-      <Background imageRef={imageRef} />
-      <Rectangle imageRef={imageRef} />
-    </svg>
+    <Fragment>
+      <img src={map} width={"500px"} height={"500px"} />
+      <svg
+        ref={ref}
+        style={{
+          width: "80vw",
+          height: "80vh",
+          border: "solid 1px"
+        }}
+      >
+        <Background imageRef={imageRef} />
+        <Rectangle imageRef={imageRef} />
+      </svg></Fragment>
   )
 }
 
